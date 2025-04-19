@@ -48,7 +48,7 @@ class _MessagePopupPageState extends State<MessagePopupPage>
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _blurAnimation = Tween<double>(begin: 0, end: 10).animate(
+    _blurAnimation = Tween<double>(begin: 0, end: 5).animate(
       CurvedAnimation(
         parent: _blurController,
         curve: Curves.easeOut,
