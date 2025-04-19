@@ -36,7 +36,16 @@ class MessageContextMenu extends StatelessWidget {
       _HeroPopupRoute(
         anchorRect: sourceRect,
         tag: tag,
-        child: child,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                child,
+              ],
+            ),
+          ),
+        ),
         actions: actions,
         reactions: reactions,
         isIOS: Platform.isIOS,

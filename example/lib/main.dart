@@ -349,32 +349,32 @@ class MessageBubble extends StatelessWidget {
 
     return Container(
       constraints: const BoxConstraints(maxWidth: 280),
+      decoration: BoxDecoration(
+        color: isMe
+            ? theme.colorScheme.primary
+            : theme.colorScheme.secondaryContainer,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(16),
+          topRight: const Radius.circular(16),
+          bottomLeft: Radius.circular(isMe ? 16 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 16),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Column(
         crossAxisAlignment:
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            decoration: BoxDecoration(
+          Text(
+            message.text,
+            style: theme.textTheme.bodyLarge?.copyWith(
               color: isMe
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: Radius.circular(isMe ? 16 : 4),
-                bottomRight: Radius.circular(isMe ? 4 : 16),
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(
-              message.text,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: isMe
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSecondaryContainer,
-              ),
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSecondaryContainer,
             ),
           ),
+          const SizedBox(height: 4),
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Row(
@@ -383,7 +383,9 @@ class MessageBubble extends StatelessWidget {
                 Text(
                   _formatTime(message.timestamp),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                    color: isMe
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 if (isMe) ...[
@@ -392,15 +394,17 @@ class MessageBubble extends StatelessWidget {
                     message.isRead ? Icons.done_all : Icons.done,
                     size: 16,
                     color: message.isRead
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.onSurfaceVariant,
+                        ? theme.colorScheme.inversePrimary
+                        : theme.colorScheme.onPrimary,
                   ),
                 ],
                 if (message.reactions.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surfaceVariant,
                       borderRadius: BorderRadius.circular(10),

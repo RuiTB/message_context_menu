@@ -131,7 +131,7 @@ class MessageEmojiReactions extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: reaction.isSelected ? selectedColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(50),
+            shape: BoxShape.circle,
           ),
           child: Text(
             reaction.emoji,

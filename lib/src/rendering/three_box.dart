@@ -293,31 +293,7 @@ class RenderThreeBox extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    var child = firstChild;
-    var index = 0;
-
-    while (child != null) {
-      final childParentData = child.parentData as ThreeBoxParentData;
-      final childOffset = offset + childParentData.offset;
-
-      if (index == 0) {
-        final transform = Matrix4.identity()
-          ..translate(childOffset.dx, childOffset.dy)
-          ..scale(scaleFactor, scaleFactor);
-
-        context.pushTransform(
-          needsCompositing,
-          Offset.zero,
-          transform,
-          (context, _) => context.paintChild(child!, Offset.zero),
-        );
-      } else {
-        context.paintChild(child, childOffset);
-      }
-
-      child = childParentData.nextSibling;
-      index++;
-    }
+    defaultPaint(context, offset);
   }
 
   @override
