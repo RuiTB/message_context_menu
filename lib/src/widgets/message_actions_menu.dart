@@ -5,14 +5,21 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../models/message_action.dart';
 
 class MessageActionsMenu extends StatelessWidget {
-  const MessageActionsMenu({
+  MessageActionsMenu({
     required this.actions,
     required this.isClosing,
     required this.isIOS,
     this.stepWidth = 100,
     this.alignLeft,
     super.key,
-  });
+  }) : _controller = ScrollController();
+
+  static const double _kMenuWidth = 250.0;
+  static const double _kScrollbarMainAxisMargin = 13.0;
+  static const Color _borderColor = CupertinoDynamicColor.withBrightness(
+    color: Color(0xFFA9A9AF),
+    darkColor: Color(0xFF57585A),
+  );
 
   final List<MessageAction> actions;
   final bool isClosing;
@@ -23,6 +30,8 @@ class MessageActionsMenu extends StatelessWidget {
   /// If null, alignment is automatically determined based on position.
   final bool? alignLeft;
 
+  final ScrollController _controller;
+
   @override
   Widget build(BuildContext context) {
     // Determine if we should align left based on directionality and parent position
@@ -31,13 +40,7 @@ class MessageActionsMenu extends StatelessWidget {
     // Use the provided alignLeft value or calculate it automatically
     final shouldAlignLeft = alignLeft ?? _calculateAlignment(context, isRTL);
 
-    final alignment = shouldAlignLeft
-        ? isRTL
-            ? Alignment.topRight
-            : Alignment.topLeft
-        : isRTL
-            ? Alignment.topLeft
-            : Alignment.topRight;
+    final alignment = shouldAlignLeft ? Alignment.topLeft : Alignment.topRight;
 
     Widget menu = isIOS ? _buildIOSMenu(context) : _buildMaterialMenu(context);
 
@@ -66,33 +69,66 @@ class MessageActionsMenu extends StatelessWidget {
   }
 
   Widget _buildIOSMenu(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        borderRadius: BorderRadius.circular(13),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: IntrinsicWidth(
-          stepWidth: stepWidth,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: actions.map((action) {
-              return CupertinoContextMenuAction(
-                isDestructiveAction: action.isDestructive,
-                trailingIcon: action.icon,
-                onPressed: action.onPressed,
-                child: Text(
-                  action.label,
-                  style: TextStyle(
-                    color: action.isDestructive
-                        ? CupertinoColors.destructiveRed
-                        : action.color ?? CupertinoColors.label,
+    return SizedBox(
+      width: _kMenuWidth,
+      child: IntrinsicHeight(
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(Radius.circular(13.0)),
+          child: ColoredBox(
+            color: CupertinoDynamicColor.resolve(
+              CupertinoContextMenu.kBackgroundColor,
+              context,
+            ),
+            child: ScrollConfiguration(
+              behavior:
+                  ScrollConfiguration.of(context).copyWith(scrollbars: false),
+              child: CupertinoScrollbar(
+                mainAxisMargin: _kScrollbarMainAxisMargin,
+                controller: _controller,
+                child: SingleChildScrollView(
+                  controller: _controller,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildIOSAction(actions.first, context),
+                      for (final action in actions.skip(1))
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: CupertinoDynamicColor.resolve(
+                                  _borderColor,
+                                  context,
+                                ),
+                                width: 0.4,
+                              ),
+                            ),
+                          ),
+                          position: DecorationPosition.foreground,
+                          child: _buildIOSAction(action, context),
+                        ),
+                    ],
                   ),
                 ),
-              );
-            }).toList(),
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIOSAction(MessageAction action, BuildContext context) {
+    return CupertinoContextMenuAction(
+      isDestructiveAction: action.isDestructive,
+      trailingIcon: action.icon,
+      onPressed: action.onPressed,
+      child: Text(
+        action.label,
+        style: TextStyle(
+          color: action.isDestructive
+              ? CupertinoColors.destructiveRed
+              : action.color ?? CupertinoColors.label,
         ),
       ),
     );

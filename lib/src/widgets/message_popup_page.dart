@@ -76,7 +76,11 @@ class _MessagePopupPageState extends State<MessagePopupPage>
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: _handleClose,
+      onTap: () {
+        if (!_isClosing) {
+          _handleClose();
+        }
+      },
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: AnimatedBuilder(
@@ -125,9 +129,17 @@ class _MessagePopupPageState extends State<MessagePopupPage>
                         return EmojiReaction(
                           emoji: reaction.emoji,
                           isSelected: reaction.isSelected,
-                          onPressed: () {
-                            _handleClose();
-                            reaction.onPressed();
+                          onPressed: (value, context) async {
+                            if (reaction.autoClose) {
+                              _handleClose();
+                            }
+                            final result = await reaction.onPressed(
+                              value,
+                              context,
+                            );
+                            if (result == true) {
+                              _handleClose();
+                            }
                           },
                         );
                       }).toList(),

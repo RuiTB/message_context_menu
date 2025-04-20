@@ -123,11 +123,20 @@ class RenderThreeBox extends RenderBox
     if (children.isEmpty) return;
 
     final safeArea = _safeArea;
+    // Calculate the safe area rectangle
+    final screenSize =
+        ui.PlatformDispatcher.instance.implicitView?.physicalSize;
+    final pixelRatio =
+        ui.PlatformDispatcher.instance.implicitView?.devicePixelRatio;
+    // normalize the safe area to the screen size
+    final safeAreaWidth = screenSize!.width / pixelRatio!;
+    final safeAreaHeight = screenSize.height / pixelRatio;
+
     final safeRect = Rect.fromLTRB(
       safeArea.left,
-      safeArea.top,
-      size.width - safeArea.right,
-      size.height - safeArea.bottom,
+      safeArea.top + _margin,
+      safeAreaWidth - safeArea.right,
+      safeAreaHeight - safeArea.bottom - _margin,
     );
 
     // Get references to the children
@@ -263,14 +272,16 @@ class RenderThreeBox extends RenderBox
     final alignLeft = _alignLeft ??
         (anchorRect.center.dx - safeRect.left) < safeRect.width / 2;
 
+    const padding = 8;
+
     // Position below widget
     if (below != null) {
       final parentData = below.parentData! as ThreeBoxParentData;
       var x = alignLeft ? anchorRect.left : anchorRect.right - belowSize.width;
 
       // Ensure it stays within safe area
-      x = math.max(safeRect.left, x);
-      x = math.min(x, safeRect.right - belowSize.width);
+      x = math.max(safeRect.left + padding, x);
+      x = math.min(x, safeRect.right - belowSize.width - padding);
 
       parentData.offset = Offset(x, anchorRect.bottom + _margin);
     }
@@ -281,8 +292,8 @@ class RenderThreeBox extends RenderBox
       var x = alignLeft ? anchorRect.left : anchorRect.right - aboveSize.width;
 
       // Ensure it stays within safe area
-      x = math.max(safeRect.left, x);
-      x = math.min(x, safeRect.right - aboveSize.width);
+      x = math.max(safeRect.left + padding, x);
+      x = math.min(x, safeRect.right - aboveSize.width - padding);
 
       parentData.offset = Offset(
         x,

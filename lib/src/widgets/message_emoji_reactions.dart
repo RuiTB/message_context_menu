@@ -30,21 +30,19 @@ class MessageEmojiReactions extends StatelessWidget {
     // Use the provided alignLeft value or calculate it automatically
     final shouldAlignLeft = alignLeft ?? _calculateAlignment(context, isRTL);
 
-    final alignment = shouldAlignLeft
-        ? isRTL
-            ? Alignment.centerRight
-            : Alignment.centerLeft
-        : isRTL
-            ? Alignment.centerLeft
-            : Alignment.centerRight;
+    final alignment =
+        shouldAlignLeft ? Alignment.centerLeft : Alignment.centerRight;
 
     // Use platform-specific styling
     final backgroundColor = isIOS
-        ? CupertinoColors.systemBackground.resolveFrom(context)
+        ? CupertinoDynamicColor.resolve(
+            CupertinoContextMenu.kBackgroundColor,
+            context,
+          )
         : theme.colorScheme.surface;
 
     final shadowColor = isIOS
-        ? CupertinoColors.systemGrey.resolveFrom(context).withOpacity(0.2)
+        ? const Color(0xFF000000).withOpacity(0.3)
         : theme.colorScheme.shadow.withOpacity(0.3);
 
     return Material(
@@ -61,18 +59,12 @@ class MessageEmojiReactions extends StatelessWidget {
               .map(
                 (index, reaction) => MapEntry(
                   index,
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: index == 0 ? 4 : 0,
-                      right: index == reactions.length - 1 ? 4 : 0,
-                    ),
-                    child: _buildEmojiReaction(
-                      reaction,
-                      index,
-                      context,
-                      isIOS: isIOS,
-                      brightness: brightness,
-                    ),
+                  _buildEmojiReaction(
+                    reaction,
+                    index,
+                    context,
+                    isIOS: isIOS,
+                    brightness: brightness,
                   ),
                 ),
               )
@@ -107,27 +99,24 @@ class MessageEmojiReactions extends StatelessWidget {
 
     // Define colors based on platform and theme
     final selectedColor = isIOS
-        ? CupertinoColors.systemGrey5.resolveFrom(context)
-        : theme.colorScheme.primaryContainer.withOpacity(0.5);
-
-    final rippleColor = isIOS
-        ? CupertinoColors.systemGrey3.resolveFrom(context)
+        ? CupertinoDynamicColor.withBrightness(
+            color: const Color(0xFFA9A9AF),
+            darkColor: const Color(0xFF57585A),
+          ).resolveFrom(context)
         : theme.colorScheme.primary.withOpacity(0.2);
 
-    final spaceBetween = isIOS ? 6.0 : 8.0;
+    const spaceBetween = 4.0;
 
     return Material(
       type: MaterialType.transparency,
-      child: InkWell(
-        onTap: reaction.onPressed,
-        borderRadius: BorderRadius.circular(50),
-        splashColor: rippleColor,
-        highlightColor: rippleColor.withOpacity(0.5),
+      child: GestureDetector(
+        onTap: () => reaction.onPressed(!reaction.isSelected, context),
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(8),
-          margin: EdgeInsets.only(
-            right: index == reactions.length - 1 ? 0 : spaceBetween,
+          margin: const EdgeInsets.only(
+            right: spaceBetween / 2,
+            left: spaceBetween / 2,
           ),
           decoration: BoxDecoration(
             color: reaction.isSelected ? selectedColor : Colors.transparent,
@@ -153,9 +142,9 @@ class MessageEmojiReactions extends StatelessWidget {
     ).animate(target: isClosing ? 0 : 1).scaleX(
           begin: 0,
           end: 1,
-          delay: Duration(milliseconds: index * 50),
+          delay: Duration(milliseconds: index * 28),
           duration: Duration(
-            milliseconds: 200 + (index * 50),
+            milliseconds: 100 + (index * 50),
           ),
           curve: Curves.easeIn,
         );

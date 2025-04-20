@@ -12,6 +12,7 @@ class MessageContextMenu extends StatelessWidget {
     required this.child,
     required this.actions,
     required this.reactions,
+    this.enebled = true,
     this.alignLeft,
     super.key,
   });
@@ -20,12 +21,14 @@ class MessageContextMenu extends StatelessWidget {
   final Widget child;
   final List<MessageAction> actions;
   final List<EmojiReaction> reactions;
+  final bool enebled;
 
   /// If provided, forces alignment to left or right.
   /// If null, alignment is automatically determined based on position.
   final bool? alignLeft;
 
   void _handleLongPress(BuildContext context) {
+    if (!enebled) return;
     final renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null || !renderBox.hasSize) return;
 
@@ -37,7 +40,7 @@ class MessageContextMenu extends StatelessWidget {
         anchorRect: sourceRect,
         tag: tag,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(4),
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -77,7 +80,7 @@ class _HeroPopupRoute extends PageRouteBuilder<void> {
     this.alignLeft,
   }) : super(
           opaque: false,
-          barrierColor: Colors.transparent,
+          barrierColor: const Color(0x6604040F),
           pageBuilder: (_, __, ___) => MessagePopupPage(
             anchorRect: anchorRect,
             tag: tag,
@@ -88,7 +91,7 @@ class _HeroPopupRoute extends PageRouteBuilder<void> {
             child: child,
           ),
           transitionDuration: const Duration(milliseconds: 200),
-          reverseTransitionDuration: const Duration(milliseconds: 200),
+          reverseTransitionDuration: const Duration(milliseconds: 500),
         );
   final Widget child;
   final Rect anchorRect;
